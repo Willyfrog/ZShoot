@@ -4,6 +4,8 @@ window.onload = function () {
         PLAYER_SPEED = 5,
         BULLET_SPEED = 10,
         Z_SPEED = 3,
+        Z_DISTANCE_INI = 200,
+        Z_DISTANCE_END = 300,
         DEBUG = true;
 
     Crafty.init(WIDTH, HEIGHT);
@@ -43,12 +45,6 @@ window.onload = function () {
         console.log("GameOver");
     });
 
-    Crafty.c("Z", {
-        init: function () {
-            this.addComponent("2D, Canvas, Collision, Color, Mouse");
-        }
-    });
-             
     Crafty.c("Player", {
         init: function () {
             this.addComponent("2D, Canvas, Multiway, Collision, Color, Mouse");
@@ -56,6 +52,10 @@ window.onload = function () {
             //TODO: collision contra Zs
             this.bind("onClick", function (e) {
                 console.log("ouch");
+            });
+            this.onHit('Z', function (){
+                this.destroy();
+                Crafty.scene("GameOver");
             });
         },
         //configuracion de controles
@@ -120,10 +120,33 @@ window.onload = function () {
         }
     });
 
+    function entityDistance(e1, e2){
+        return Crafty.math.distance(e1.x, e1.y, e2.x, e2.y);
+    }
+
+    function closerOne(e1, listEntities){
+        var p = null,
+            d = 0,
+            d2 = 0;
+
+        if (listEntities.length>0){
+            p = listEntities[0];
+            d = entityDistance(e1, p);
+            for (var i=1; i<listEntities.length; i++){
+                d2 = entityDistance(e1, listEntities[i]);
+                if (d2 < d){
+                    d = d2;
+                    p = listEntities[i];
+                }
+            }
+        }
+        return p;
+    }
+    
     Crafty.c("Z", {
         init: function () {
             this.addComponent("2D, Canvas, Color, Collision");
-            this.attr({w: 32, h: 32, life: 2}).color("green");
+            this.attr({w: 32, h: 32, life: 2, chaseafter:[], target: null}).color("green");
             this.onHit("Bullet", function (hitters) {
                 var b = hitters[0].obj;
                 this.life -= b.dmg;
@@ -133,16 +156,60 @@ window.onload = function () {
                     this.destroy();
                 }
             });
+            this.bind("EnterFrame", function () {
+                // check for new target
+
+                if (this.chaseafter.length!==0){
+                    var p = null,
+                        dist = 0;
+
+                    if (this.chaseafter.length===1)
+                        p = this.chaseafter[0];
+                    else {
+                        p = closerOne(this, this.chaseafter);
+                    }
+                    
+                    dist =  entityDistance(this, p);
+                    if (entityDistance(this, p) < Z_DISTANCE_INI){ //within smell distance?
+                        if (this.target != p) {
+                            console.log("oh! hi, nice brains!");
+                            this.target = p;
+                        }
+                    }
+
+                    if (this.target != null) {
+                        if (dist > Z_DISTANCE_END) {
+                            this.target = null; //ran away
+                        }
+
+                    }
+                    if (this.target != null){
+                        var v = new Crafty.math.Vector2D(this.target.x - this.x, this.target.y - this.y);
+                        v = v.scaleToMagnitude(Z_SPEED);
+                        this.x += v.x;
+                        this.y += v.y;
+                    }
+                }
+            });
         },
         position: function (ox, oy) {
             this.attr({x: ox, y: oy});
             return this;
+        },
+        chase: function (players) {
+            if (players instanceof Array){
+                this.chaseafter.concat(players);
+            } else {
+                this.chaseafter.push(players);
+            }
+            console.log("chasing after " + this.chaseafter.length + " players");
         }
     });
 
-    function spawnZ(x, y){
+    function spawnZ(x, y, chaselist){
         console.log("spawning a Z in " + x + ", " + y);
         var z = Crafty.e("Z");
+        z.chase(chaselist);
         return z.position(x, y);
 
     }
@@ -167,16 +234,15 @@ window.onload = function () {
         s.set_shooter(p1);
         p1.multiway_config(PLAYER_SPEED, "W", "S", "A", "D").color_config("blue").position_config(WIDTH / 2 - 10, HEIGHT / 2);
         //Crafty.viewport.clampToEntities = DEBUG;
-        //Crafty.viewport.follow(p1, 0, 0);
+        Crafty.viewport.follow(p1, 0, 0);
 
-        var z = Crafty.e("Z");
-        z.position(80, 200);
 
         this.bind("EndGame", function () {
             Crafty.scene("GameOver");
         });
 
-        spawnZ(80, 40);
+        spawnZ(80, 40, p1);
+        spawnZ(500, 480, p1);
 
     });
 
