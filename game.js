@@ -29,10 +29,8 @@ window.onload = function () {
         square: function (px, py, side) {
 
             this.attr({x: px, y: py, w: side, h: side});
-            this.collision(
-                //new Crafty.polygon([this.x, this.y], [this.x + side, this.y], [this.x + side, this.y + side], [this.x, this.y + side])
-                new Crafty.polygon([2, 2], [side-2, 2], [side-2, side-2], [2, side-2])
-            );
+            this.collision( new Crafty.polygon([[2, 2], [this._w - 2, 2], [this._w - 2, this._h - 2], [2, this._h - 2]]));
+            //this.collision( [0, 0], [this.w , 0], [this.w , this.h ], [0, this.h]);
 
             return this;
         }
@@ -50,8 +48,14 @@ window.onload = function () {
             this.addComponent("2D, Canvas, Multiway, Collision, Color, Mouse");
             this.attr({h: 32, w: 32});
             //TODO: collision contra Zs
+            this.collision(new Crafty.polygon([0,0],[this._w, 0],[this._w, this._h], [0, this._h]));
             this.bind("onClick", function (e) {
                 console.log("ouch");
+            });
+            this.bind("Moved", function (old) {
+                if (this.hit("Building")) {
+                    this.attr({x:old.x, y:old.y});
+                }
             });
             this.onHit('Z', function (){
                 this.destroy();
@@ -84,11 +88,7 @@ window.onload = function () {
         init: function() {
             this.addComponent("2D, Canvas, Collision, Color");
             this.attr({h: 2, w: 2, dmg: 1});
-            // TODO: collision contra Zs
             this.color('white');
-        },
-        sayhi: function () {
-            console.log("hi!");
         },
         firebullet: function (ox, oy, dx, dy) {
             this.attr({x: ox, y: oy,
@@ -104,15 +104,16 @@ window.onload = function () {
             });
         }
     });
+
     Crafty.c("Shooter", {
         init: function () {
             this.addComponent("2D, Mouse");
             this.attr({x: 0, y: 0, w: WIDTH, h: HEIGHT});
-            console.log("I'll shoot from x" + this.x);
+            console.log("I'll shoot from x" + this._x);
             this.bind('Click', function (e) {
                 console.log("fire, exclamation mark");
                 var b = Crafty.e("Bullet");
-                b.firebullet(this.shooter.x + 16, this.shooter.y + 16, Crafty.mousePos.x, Crafty.mousePos.y);
+                b.firebullet(this.shooter._x + 16, this.shooter._y + 16, Crafty.mousePos.x, Crafty.mousePos.y);
             });
         },
         set_shooter: function (p) {
@@ -121,7 +122,7 @@ window.onload = function () {
     });
 
     function entityDistance(e1, e2){
-        return Crafty.math.distance(e1.x, e1.y, e2.x, e2.y);
+        return Crafty.math.distance(e1._x, e1._y, e2._x, e2._y);
     }
 
     function closerOne(e1, listEntities){
@@ -147,6 +148,7 @@ window.onload = function () {
         init: function () {
             this.addComponent("2D, Canvas, Color, Collision");
             this.attr({w: 32, h: 32, life: 2, chaseafter:[], target: null}).color("green");
+            this.collision(new Crafty.polygon([0,0],[this._w, 0],[this._w, this._h], [0, this._h]));
             this.onHit("Bullet", function (hitters) {
                 var b = hitters[0].obj;
                 this.life -= b.dmg;
@@ -156,6 +158,7 @@ window.onload = function () {
                     this.destroy();
                 }
             });
+
             this.bind("EnterFrame", function () {
                 // check for new target
 
@@ -184,10 +187,18 @@ window.onload = function () {
 
                     }
                     if (this.target != null){
-                        var v = new Crafty.math.Vector2D(this.target.x - this.x, this.target.y - this.y);
+                        var v = new Crafty.math.Vector2D(this.target._x - this._x, this.target._y - this._y);
                         v = v.scaleToMagnitude(Z_SPEED);
+                        var old = this._x;
                         this.x += v.x;
+                        if (this.hit('Building') || this.hit('Z')){
+                            this.x = old;
+                        }
+                        old = this._y;
                         this.y += v.y;
+                        if (this.hit('Building') || this.hit(' Z')){
+                            this.y = old;
+                        }
                     }
                 }
             });
@@ -227,7 +238,7 @@ window.onload = function () {
         console.log("Now on GameScene");
         Crafty.background("#222");
         var b = Crafty.e("Building");
-        b.square(30, 30, 30);
+        b.square(30, 30, 80);
         //marcadores
         var s = Crafty.e("Shooter"),
             p1 = Crafty.e("Player");
@@ -241,7 +252,7 @@ window.onload = function () {
             Crafty.scene("GameOver");
         });
 
-        spawnZ(80, 40, p1);
+        spawnZ(180, 40, p1);
         spawnZ(500, 480, p1);
 
     });
