@@ -8,7 +8,9 @@ window.onload = function () {
         Z_DISTANCE_END = 300,
         DEBUG = true,
 	ROAD_SIZE = 80,
-	BUILD_MIN_SIZE = ROAD_SIZE*3;
+	BUILD_MIN_SIZE = ROAD_SIZE*3,
+	WORLD_HEIGHT = 800,
+	WORLD_WIDTH = 1280;
 
     var minimap = [];
 
@@ -19,6 +21,38 @@ window.onload = function () {
         //Crafty.load("sprites.png", function (){})
 
     });
+
+// sacado de http://jsfiddle.net/MmLZr/10/
+// posible mejora: comprobar si se ha movido
+    Crafty.c("ViewportRelative", {
+	_viewportPreviousX: 0,
+	_viewportPreviousY: 0,
+	_viewportStartX: 0,
+	_viewportStartY: 0,
+	init: function() {    
+	    this.bind("EnterFrame", this._frame); 
+	},
+	_frame: function() {
+	    if(this._viewportPreviousX != Crafty.viewport._x) {
+		this._viewportStartX = Crafty.viewport._x;
+		
+		this.x += this._viewportPreviousX;
+		this.x -= Crafty.viewport._x;
+		
+		this._viewportPreviousX = this._viewportStartX;
+	    }
+            
+	    if(this._viewportPreviousY != Crafty.viewport._y) {
+		this._viewportStartY = Crafty.viewport._y;
+		
+		this.x += this._viewportPreviousY;
+		this.x -= Crafty.viewport._y;
+		
+		this._viewportPreviousX = this._viewportStartX;
+	    }
+	}
+    });
+    
 
     function divide_square(x1,y1,w,h){
 	console.log('diviendo');
@@ -303,7 +337,8 @@ window.onload = function () {
 
     Crafty.scene("GameScene", function () {
         console.log("Now on GameScene");
-	minimap = gen_map(1280,800);
+	minimap = gen_map(WORLD_WIDTH,WORLD_HEIGHT);
+	var area = Crafty.e("2D").attr({x:0, y:0, w:WORLD_WIDTH, h: WORLD_HEIGHT});
 	var b = null;
 	for (var i=0; i<minimap.length; i++){
 	    b = Crafty.e("Building");
@@ -317,11 +352,13 @@ window.onload = function () {
             p1 = Crafty.e("Player");
         s.set_shooter(p1);
         p1.multiway_config(PLAYER_SPEED, "W", "S", "A", "D").color_config("blue").position_config(0, 10);
-        //Crafty.viewport.clampToEntities = DEBUG;
+        Crafty.viewport.clampToEntities = false;
         Crafty.viewport.follow(p1, 0, 0);
 
 
         this.bind("EndGame", function () {
+	    p1.destroy();
+	    area.destroy();
             Crafty.scene("GameOver");
         });
 
