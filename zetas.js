@@ -1,7 +1,8 @@
 Crafty.c("Z", {
     init: function () {
-        this.addComponent("2D, Canvas, Color, Collision");
-        this.attr({w: 32, h: 32, life: 2, chaseafter:[], target: null}).color("green");
+        this.addComponent("2D, Canvas, Collision, z1");
+        this.attr({w: 32, h: 32, life: 2, chaseafter:[], target: null});
+	//this..color("green");
         this.collision(new Crafty.polygon([0,0],[this._w, 0],[this._w, this._h], [0, this._h]));
         this.onHit("Bullet", function (hitters) {
             var b = hitters[0].obj;
@@ -76,5 +77,4 @@ function spawnZ(x, y, chaselist){
     var z = Crafty.e("Z");
     z.chase(chaselist);
     return z.position(x, y);
-
 }

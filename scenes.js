@@ -1,5 +1,6 @@
 Crafty.scene("GameScene", function () {
     console.log("Now on GameScene");
+    Crafty.sprite(1,"recursos/z.png",{z1:[0,0,20,32]});
     minimap = gen_map(WORLD_WIDTH,WORLD_HEIGHT);
     var area = Crafty.e("2D").attr({x:0, y:0, w:WORLD_WIDTH, h: WORLD_HEIGHT});
     var b = null;
@@ -30,18 +31,23 @@ Crafty.scene("GameScene", function () {
 });
 
 Crafty.scene("GameOver", function () {
+    console.log("vpx: " +  Crafty.viewport.x);
+    console.log("vpy: " +  Crafty.viewport.y);
+    Crafty("2D").destroy(); //remove all zombies
+    Crafty.viewport.x=0;
+    Crafty.viewport.y=0;
     Crafty.e("2D, Text, DOM").attr({x: WIDTH / 2 - 50, y: HEIGHT / 3, w:100 }).text("GAME OVER");
     Crafty.e("2D, Text, DOM").attr({x: WIDTH / 2 - 55, y: HEIGHT / 3 + 30, w:110}).text("Press R to restart");
     Crafty.background("#555");
     console.log("GameOver");
     Crafty.e("Keyboard").bind('KeyDown', function (){
-	if (this.isDown('R'))
+	if (this.isDown('R')){
+	    this.unbind('KeyDown');
 	    Crafty.scene("GameScene");
+	}
     });
 });
 
 Crafty.scene("LoadingScene", function () {
     console.log("Loading Assets");
-    //Crafty.load("sprites.png", function (){})
-    
 });
