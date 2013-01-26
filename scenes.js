@@ -39,3 +39,9 @@ Crafty.scene("GameOver", function () {
 	    Crafty.scene("GameScene");
     });
 });
+
+Crafty.scene("LoadingScene", function () {
+    console.log("Loading Assets");
+    //Crafty.load("sprites.png", function (){})
+    
+});
