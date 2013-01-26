@@ -69,14 +69,6 @@ window.onload = function () {
             });
         },
 
-       // square: function (px, py, side) {
-       //
-       //     this.attr({x: px, y: py, w: side, h: side});
-       //     this.collision( new Crafty.polygon([[2, 2], [this._w - 2, 2], [this._w - 2, this._h - 2], [2, this._h - 2]]));
-       //     //this.collision( [0, 0], [this.w , 0], [this.w , this.h ], [0, this.h]);
-       //
-       //     return this;
-       // },
         build: function (px, py, sidex, sidey) {
 	    if (sidey==undefined) {
 		sidey = sidex;
@@ -86,13 +78,39 @@ window.onload = function () {
             //this.collision( [0, 0], [this.w , 0], [this.w , this.h ], [0, this.h]);
 
             return this;
-        }
+        },
+	es_ancho: function()
+	{
+	    return w > h;
+	}
+    });
+
+    //para generar los nodos para pathfinding, deben ir a las intersecciones
+    Crafty.c("Interseccion", {
+	init: function () {
+	    this.addComponent("2D, Canvas");
+	    this.attr({w:ROAD_SIZE, h:ROAD_SIZE});
+	},
+	center: function (x, y) {
+	    if(y!==undefined){
+		this.y = y;
+	    }
+	    if(x!==undefined){
+		this.x = x;
+	    }
+	    return this;
+	}
     });
 
     Crafty.scene("GameOver", function () {
-        Crafty.e("2D, Text, DOM").attr({x: WIDTH / 2 - 40, y: HEIGHT / 3 }).text("GAME OVER");
+        Crafty.e("2D, Text, DOM").attr({x: WIDTH / 2 - 50, y: HEIGHT / 3, w:100 }).text("GAME OVER");
+        Crafty.e("2D, Text, DOM").attr({x: WIDTH / 2 - 55, y: HEIGHT / 3 + 30, w:110}).text("Press R to restart");
         Crafty.background("#555");
         console.log("GameOver");
+	Crafty.e("Keyboard").bind('KeyDown', function (){
+	    if (this.isDown('R'))
+		Crafty.scene("GameScene");
+	});
     });
 
     Crafty.c("Player", {
