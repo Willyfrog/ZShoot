@@ -6,7 +6,11 @@ window.onload = function () {
         Z_SPEED = 3,
         Z_DISTANCE_INI = 200,
         Z_DISTANCE_END = 300,
-        DEBUG = true;
+        DEBUG = true,
+	ROAD_SIZE = 80,
+	BUILD_MIN_SIZE = ROAD_SIZE*3;
+
+    var minimap = [];
 
     Crafty.init(WIDTH, HEIGHT);
     Crafty.canvas.init();
@@ -16,6 +20,45 @@ window.onload = function () {
 
     });
 
+    function divide_square(x1,y1,w,h){
+	console.log('diviendo');
+	// si es el tamaño minimo, no dividimos
+	if (w< BUILD_MIN_SIZE && h<BUILD_MIN_SIZE)
+	    return [[x1, y1, w, h]];
+	// si no tiene suficiente ancho->en altura fijo
+	var divancho = true;
+	if (w<BUILD_MIN_SIZE){
+	    divancho = false;
+	} else if (h>BUILD_MIN_SIZE){
+	    divancho = (Crafty.math.randomInt(1,3)>1);
+	}
+	
+	console.log("divancho: " + divancho);  
+	if (divancho){
+	    var w2 = Crafty.math.randomInt(ROAD_SIZE,w - ROAD_SIZE*2);
+	    return [[x1,y1, w2, h], [x1+w2+ROAD_SIZE, y1, w-w2-ROAD_SIZE, h]];
+	}
+	else {
+	    var h2 = Crafty.math.randomInt(ROAD_SIZE,h - ROAD_SIZE);
+	    return [[x1,y1, w, h2],[x1, y1+h2+ROAD_SIZE, w, h-h2-ROAD_SIZE]];
+	}
+    }
+
+    function gen_map(maxx, maxy){
+	var pasadas = 5;
+	var city = [[ROAD_SIZE,ROAD_SIZE,maxx-ROAD_SIZE,maxy - ROAD_SIZE]];
+	console.log("city inicial: " + city);
+	for (var i=0; i<pasadas; i++){
+	    var nucity = [];
+	    for(var s=0; s<city.length; s++){
+		nucity = nucity.concat(divide_square(city[s][0],city[s][1],city[s][2],city[s][3]));
+	    }
+	    city = nucity;
+	}
+	console.log("ciudad: " + city);
+	return city;
+    }
+    
     Crafty.c("Building", {
         init: function () {
             this.addComponent("2D, Canvas, Color, Collision");
@@ -26,15 +69,24 @@ window.onload = function () {
             });
         },
 
-        square: function (px, py, side) {
-
-            this.attr({x: px, y: py, w: side, h: side});
+       // square: function (px, py, side) {
+       //
+       //     this.attr({x: px, y: py, w: side, h: side});
+       //     this.collision( new Crafty.polygon([[2, 2], [this._w - 2, 2], [this._w - 2, this._h - 2], [2, this._h - 2]]));
+       //     //this.collision( [0, 0], [this.w , 0], [this.w , this.h ], [0, this.h]);
+       //
+       //     return this;
+       // },
+        build: function (px, py, sidex, sidey) {
+	    if (sidey==undefined) {
+		sidey = sidex;
+	    }
+            this.attr({x: px, y: py, w: sidex, h: sidey});
             this.collision( new Crafty.polygon([[2, 2], [this._w - 2, 2], [this._w - 2, this._h - 2], [2, this._h - 2]]));
             //this.collision( [0, 0], [this.w , 0], [this.w , this.h ], [0, this.h]);
 
             return this;
         }
-
     });
 
     Crafty.scene("GameOver", function () {
@@ -227,23 +279,26 @@ window.onload = function () {
 
     Crafty.c("Generator", {
         init: function () {
-
+	    return true;
         }
     });
 
     Crafty.scene("GameScene", function () {
-
-
-
         console.log("Now on GameScene");
+	minimap = gen_map(1280,800);
+	var b = null;
+	for (var i=0; i<minimap.length; i++){
+	    b = Crafty.e("Building");
+            b.build(minimap[i][0], minimap[i][1], minimap[i][2], minimap[i][3]);
+	}
         Crafty.background("#222");
-        var b = Crafty.e("Building");
-        b.square(30, 30, 80);
+
+
         //marcadores
         var s = Crafty.e("Shooter"),
             p1 = Crafty.e("Player");
         s.set_shooter(p1);
-        p1.multiway_config(PLAYER_SPEED, "W", "S", "A", "D").color_config("blue").position_config(WIDTH / 2 - 10, HEIGHT / 2);
+        p1.multiway_config(PLAYER_SPEED, "W", "S", "A", "D").color_config("blue").position_config(0, 10);
         //Crafty.viewport.clampToEntities = DEBUG;
         Crafty.viewport.follow(p1, 0, 0);
 
