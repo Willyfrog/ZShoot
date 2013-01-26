@@ -18,6 +18,7 @@ Crafty.scene("GameScene", function () {
     p1.multiway_config(PLAYER_SPEED, "W", "S", "A", "D").color_config("blue").position_config(0, 10);
     Crafty.viewport.clampToEntities = false;
     Crafty.viewport.follow(p1, 0, 0);
+    //Crafty.viewport.bounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
         
     this.bind("EndGame", function () {
 	p1.destroy();

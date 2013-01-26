@@ -70,7 +70,7 @@ window.onload = function () {
     Crafty.c("Shooter", {
         init: function () {
             this.addComponent("2D, Mouse");
-            this.attr({x: 0, y: 0, w: WIDTH, h: HEIGHT});
+            this.attr({x: 0, y: 0, w: WORLD_WIDTH, h: WORLD_HEIGHT});
             console.log("I'll shoot from x" + this._x);
             this.bind('Click', function (e) {
                 console.log("fire, exclamation mark");
