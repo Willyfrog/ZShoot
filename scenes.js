@@ -1,13 +1,9 @@
 Crafty.scene("GameScene", function () {
     console.log("Now on GameScene");
     Crafty.sprite(1,"recursos/z.png",{z1:[0,0,20,32]});
-    minimap = gen_map(WORLD_WIDTH,WORLD_HEIGHT);
-    var area = Crafty.e("2D").attr({x:0, y:0, w:WORLD_WIDTH, h: WORLD_HEIGHT});
-    var b = null;
-    for (var i=0; i<minimap.length; i++){
-	b = Crafty.e("Building");
-        b.build(minimap[i][0], minimap[i][1], minimap[i][2], minimap[i][3]);
-    }
+    build_map(WORLD_WIDTH,WORLD_HEIGHT);
+    //var area = Crafty.e("2D").attr({x:0, y:0, w:WORLD_WIDTH, h: WORLD_HEIGHT});
+
     Crafty.background("#222");
     
     
