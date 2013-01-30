@@ -1,7 +1,7 @@
 var ROAD_SIZE = 80,
     BUILD_MIN_SIZE = 3,
-    WORLD_HEIGHT = 10,
-    WORLD_WIDTH = 16;
+    WORLD_HEIGHT = 9,
+    WORLD_WIDTH = 15;
 
 function divide_square(x1,y1,w,h){
     // si es el tamaño minimo, no dividimos
@@ -11,31 +11,31 @@ function divide_square(x1,y1,w,h){
     var divancho = true;
     if (w<BUILD_MIN_SIZE){
 	divancho = false;
-    } else if (h>BUILD_MIN_SIZE){
+    } else if (h>BUILD_MIN_SIZE) {
 	divancho = (Crafty.math.randomInt(1,3)>1);
     }
 
     if (divancho){
 	var w2 = Crafty.math.randomInt(1,w - 2);
-	//Crafty.e("Interseccion").center(x1+w2 + ROAD_SIZE / 2, y1 + ROAD_SIZE / 2 );
-	//Crafty.e("Interseccion").center(x1+w2 + ROAD_SIZE / 2, y1 + h + ROAD_SIZE / 2 );
+	Crafty.e("Interseccion").center((x1+w2) * ROAD_SIZE, (y1 -1 )* ROAD_SIZE);
+	Crafty.e("Interseccion").center((x1+w2)* ROAD_SIZE, (y1 + h)*ROAD_SIZE);
 	return [[x1,y1, w2, h], [x1+w2+1, y1, w-w2-1, h]];
     }
     else {
 	var h2 = Crafty.math.randomInt(1,h - 2);
-	//Crafty.e("Interseccion").center(x1 + ROAD_SIZE / 2, y1 + h2 + ROAD_SIZE / 2 );
-	//Crafty.e("Interseccion").center(x1+w + ROAD_SIZE / 2, y1 + h2 + ROAD_SIZE / 2 );
+	Crafty.e("Interseccion").center((x1-1)*ROAD_SIZE, (y1 + h2) * ROAD_SIZE);
+	Crafty.e("Interseccion").center((x1+w) * ROAD_SIZE, (y1 + h2) * ROAD_SIZE);
 	return [[x1,y1, w, h2],[x1, y1+h2+1, w, h-h2-1]];
     }
 }
 
 function gen_map(maxx, maxy){
     var pasadas = 5;
-    var city = [[1,1,maxx-1,maxy - 1]];
-    Crafty.e("Interseccion").center(ROAD_SIZE / 2, ROAD_SIZE/2 );
-    Crafty.e("Interseccion").center((maxx - 0.5) * ROAD_SIZE, ROAD_SIZE / 2 );
-    Crafty.e("Interseccion").center((maxx - 0.5)*ROAD_SIZE, (maxy - 0.5) * ROAD_SIZE);
-    Crafty.e("Interseccion").center(ROAD_SIZE / 2, (maxy - 0.5)*ROAD_SIZE);
+    var city = [[1,1,maxx - 1,maxy - 1]];
+    Crafty.e("Interseccion").center(0, 0);
+    Crafty.e("Interseccion").center(maxx * ROAD_SIZE, 0);
+    Crafty.e("Interseccion").center(maxx*ROAD_SIZE, maxy * ROAD_SIZE);
+    Crafty.e("Interseccion").center(0, maxy*ROAD_SIZE);
     console.log("city inicial: " + city);
     for (var i=0; i<pasadas; i++){
 	var nucity = [];
@@ -95,10 +95,10 @@ Crafty.c("Interseccion", {
     },
     center: function (x, y) {
 	if(y!==undefined){
-	    this.y = y-ROAD_SIZE/2;
+	    this.y = y;
 	}
 	if(x!==undefined){
-	    this.x = x-ROAD_SIZE/2;
+	    this.x = x;
 	}
 	return this;
     },
