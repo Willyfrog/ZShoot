@@ -17,8 +17,10 @@ function divide_square(x1,y1,w,h){
 
     if (divancho){
 	var w2 = Crafty.math.randomInt(1,w - 2);
-	Crafty.e("Interseccion").center((x1+w2) * ROAD_SIZE, (y1 -1 )* ROAD_SIZE);
-	Crafty.e("Interseccion").center((x1+w2)* ROAD_SIZE, (y1 + h)*ROAD_SIZE);
+	//Crafty.e("Interseccion").center((x1+w2) * ROAD_SIZE, (y1 -1 )* ROAD_SIZE);
+	checkAndAddIntersection((x1+w2) * ROAD_SIZE, (y1 -1 )* ROAD_SIZE);
+	//Crafty.e("Interseccion").center((x1+w2)* ROAD_SIZE, (y1 + h)*ROAD_SIZE);
+	checkAndAddIntersection((x1+w2)* ROAD_SIZE, (y1 + h)*ROAD_SIZE);
 	return [[x1,y1, w2, h], [x1+w2+1, y1, w-w2-1, h]];
     }
     else {
@@ -84,14 +86,26 @@ Crafty.c("Building", {
     }
 });
 
-
+function checkAndAddIntersection (x,y) {
+    var notfound = true;
+    //TODO: optimizar
+    for (var i in Crafty("Interseccion")) {
+	if (i._x == x && i.__y == y) {
+	    notfound = false;
+	    break;
+	}
+    }
+    if (notfound) {
+	Crafty.e("Interseccion").center(x,y);
+    }
+}
 
 //para generar los nodos para pathfinding, deben ir a las intersecciones
 Crafty.c("Interseccion", {
     init: function () {
-	this.addComponent("2D, Canvas, Color");
+	this.addComponent("2D, Canvas, Color, Collision, WiredHitBox");
 	this.attr({w:ROAD_SIZE, h:ROAD_SIZE, paths:{}});
-	this.color("Pink");
+	this.color("Black");
     },
     center: function (x, y) {
 	if(y!==undefined){
