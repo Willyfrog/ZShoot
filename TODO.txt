@@ -1,0 +1,21 @@
+
+TAREAS
+Orientacion sprite zombie
+sprite pj 1
+sprite pj 2
+puerta de edificio
+grafo de intersecciones
+pathfinding
+pj 2
+probar control de pj mediante raton
+generador de zombies
+	  - podrian salir de las puertas rotas una vez se las dispare/acuchille
+objetos conseguibles
+	- municion
+	- curacion
+	- anillo (obj)
+puntuacion
+contador de municion
+acuchillamiento
+cruz al morir
+transicion de fin de juego
