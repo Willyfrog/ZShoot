@@ -1,7 +1,7 @@
-var ROAD_SIZE = 80,
-    BUILD_MIN_SIZE = 3,
-    WORLD_HEIGHT = 9,
-    WORLD_WIDTH = 15;
+var UNIT_SIZE = 8,
+    BUILD_MIN_SIZE = 30,
+    WORLD_HEIGHT = 90,
+    WORLD_WIDTH = 150;
 
 function divide_square(x1,y1,w,h){
     // si es el tamaño minimo, no dividimos
@@ -16,28 +16,28 @@ function divide_square(x1,y1,w,h){
     }
 
     if (divancho){
-	var w2 = Crafty.math.randomInt(1,w - 2);
-	//Crafty.e("Interseccion").center((x1+w2) * ROAD_SIZE, (y1 -1 )* ROAD_SIZE);
-	checkAndAddIntersection((x1+w2) * ROAD_SIZE, (y1 -1 )* ROAD_SIZE);
-	//Crafty.e("Interseccion").center((x1+w2)* ROAD_SIZE, (y1 + h)*ROAD_SIZE);
-	checkAndAddIntersection((x1+w2)* ROAD_SIZE, (y1 + h)*ROAD_SIZE);
-	return [[x1,y1, w2, h], [x1+w2+1, y1, w-w2-1, h]];
+	var w2 = Crafty.math.randomInt(10,w - 20);
+	//Crafty.e("Interseccion").center((x1+w2) * UNIT_SIZE, (y1 -1 )* UNIT_SIZE);
+	checkAndAddIntersection((x1+w2) * UNIT_SIZE, (y1 -10)* UNIT_SIZE);
+	//Crafty.e("Interseccion").center((x1+w2)* UNIT_SIZE, (y1 + h)*UNIT_SIZE);
+	checkAndAddIntersection((x1+w2)* UNIT_SIZE, (y1 + h)*UNIT_SIZE);
+	return [[x1,y1, w2, h], [x1+w2+10, y1, w-w2-10, h]];
     }
     else {
-	var h2 = Crafty.math.randomInt(1,h - 2);
-	Crafty.e("Interseccion").center((x1-1)*ROAD_SIZE, (y1 + h2) * ROAD_SIZE);
-	Crafty.e("Interseccion").center((x1+w) * ROAD_SIZE, (y1 + h2) * ROAD_SIZE);
-	return [[x1,y1, w, h2],[x1, y1+h2+1, w, h-h2-1]];
+	var h2 = Crafty.math.randomInt(10,h - 20);
+	Crafty.e("Interseccion").center((x1-10)*UNIT_SIZE, (y1 + h2) * UNIT_SIZE);
+	Crafty.e("Interseccion").center((x1+w) * UNIT_SIZE, (y1 + h2) * UNIT_SIZE);
+	return [[x1,y1, w, h2],[x1, y1+h2+10, w, h-h2-10]];
     }
 }
 
 function gen_map(maxx, maxy){
     var pasadas = 5;
-    var city = [[1,1,maxx - 1,maxy - 1]];
+    var city = [[10,10,maxx - 10,maxy - 10]];
     Crafty.e("Interseccion").center(0, 0);
-    Crafty.e("Interseccion").center(maxx * ROAD_SIZE, 0);
-    Crafty.e("Interseccion").center(maxx*ROAD_SIZE, maxy * ROAD_SIZE);
-    Crafty.e("Interseccion").center(0, maxy*ROAD_SIZE);
+    Crafty.e("Interseccion").center(maxx * UNIT_SIZE, 0);
+    Crafty.e("Interseccion").center(maxx*UNIT_SIZE, maxy * UNIT_SIZE);
+    Crafty.e("Interseccion").center(0, maxy*UNIT_SIZE);
     console.log("city inicial: " + city);
     for (var i=0; i<pasadas; i++){
 	var nucity = [];
@@ -56,7 +56,7 @@ function build_map(maxx, maxy){
     //build terrain
     var b = null;
     for (var i=0; i<minimap.length; i++){
-	Crafty.e("Building").build(minimap[i][0]*ROAD_SIZE, minimap[i][1]*ROAD_SIZE, minimap[i][2]*ROAD_SIZE, minimap[i][3]*ROAD_SIZE);
+	Crafty.e("Building").build(minimap[i][0]*UNIT_SIZE, minimap[i][1]*UNIT_SIZE, minimap[i][2]*UNIT_SIZE, minimap[i][3]*UNIT_SIZE);
     }
 }
 
@@ -104,15 +104,15 @@ function checkAndAddIntersection (x,y) {
 Crafty.c("Interseccion", {
     init: function () {
 	this.addComponent("2D, Canvas, Color, Collision, WiredHitBox");
-	this.attr({w:ROAD_SIZE, h:ROAD_SIZE, paths:{}});
+	this.attr({w:UNIT_SIZE, h:UNIT_SIZE, paths:{}});
 	this.color("Black");
     },
     center: function (x, y) {
 	if(y!==undefined){
-	    this.y = y;
+	    this.y = y + 5*UNIT_SIZE;
 	}
 	if(x!==undefined){
-	    this.x = x;
+	    this.x = x + 5*UNIT_SIZE;
 	}
 	return this;
     },
