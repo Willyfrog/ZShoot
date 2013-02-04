@@ -9,24 +9,22 @@ function divide_square(x1,y1,w,h){
 	return [[x1, y1, w, h]];
     // si no tiene suficiente ancho->en altura fijo
     var divancho = true;
-    if (w<BUILD_MIN_SIZE){
+    if (w<BUILD_MIN_SIZE) {
 	divancho = false;
     } else if (h>BUILD_MIN_SIZE) {
 	divancho = (Crafty.math.randomInt(1,3)>1);
     }
 
-    if (divancho){
+    if (divancho) {
 	var w2 = Crafty.math.randomInt(10,w - 20);
-	//Crafty.e("Interseccion").center((x1+w2) * UNIT_SIZE, (y1 -1 )* UNIT_SIZE);
 	checkAndAddIntersection((x1+w2) * UNIT_SIZE, (y1 -10)* UNIT_SIZE);
-	//Crafty.e("Interseccion").center((x1+w2)* UNIT_SIZE, (y1 + h)*UNIT_SIZE);
 	checkAndAddIntersection((x1+w2)* UNIT_SIZE, (y1 + h)*UNIT_SIZE);
 	return [[x1,y1, w2, h], [x1+w2+10, y1, w-w2-10, h]];
     }
     else {
 	var h2 = Crafty.math.randomInt(10,h - 20);
-	Crafty.e("Interseccion").center((x1-10)*UNIT_SIZE, (y1 + h2) * UNIT_SIZE);
-	Crafty.e("Interseccion").center((x1+w) * UNIT_SIZE, (y1 + h2) * UNIT_SIZE);
+	checkAndAddIntersection((x1-10)*UNIT_SIZE, (y1 + h2) * UNIT_SIZE);
+	checkAndAddIntersection((x1+w) * UNIT_SIZE, (y1 + h2) * UNIT_SIZE);
 	return [[x1,y1, w, h2],[x1, y1+h2+10, w, h-h2-10]];
     }
 }
@@ -34,10 +32,10 @@ function divide_square(x1,y1,w,h){
 function gen_map(maxx, maxy){
     var pasadas = 5;
     var city = [[10,10,maxx - 10,maxy - 10]];
-    Crafty.e("Interseccion").center(0, 0);
-    Crafty.e("Interseccion").center(maxx * UNIT_SIZE, 0);
-    Crafty.e("Interseccion").center(maxx*UNIT_SIZE, maxy * UNIT_SIZE);
-    Crafty.e("Interseccion").center(0, maxy*UNIT_SIZE);
+    Crafty.e("Interseccion").origen(0, 0);
+    Crafty.e("Interseccion").origen(maxx * UNIT_SIZE, 0);
+    Crafty.e("Interseccion").origen(maxx*UNIT_SIZE, maxy * UNIT_SIZE);
+    Crafty.e("Interseccion").origen(0, maxy*UNIT_SIZE);
     console.log("city inicial: " + city);
     for (var i=0; i<pasadas; i++){
 	var nucity = [];
@@ -90,13 +88,13 @@ function checkAndAddIntersection (x,y) {
     var notfound = true;
     //TODO: optimizar
     for (var i in Crafty("Interseccion")) {
-	if (i._x == x && i.__y == y) {
+	if (i.ox == x && i.oy == y) {
 	    notfound = false;
 	    break;
 	}
     }
     if (notfound) {
-	Crafty.e("Interseccion").center(x,y);
+	Crafty.e("Interseccion").origen(x,y);
     }
 }
 
@@ -107,11 +105,13 @@ Crafty.c("Interseccion", {
 	this.attr({w:UNIT_SIZE, h:UNIT_SIZE, paths:{}});
 	this.color("Black");
     },
-    center: function (x, y) {
+    origen: function (x, y) {
 	if(y!==undefined){
+	    this.oy = y;
 	    this.y = y + 5*UNIT_SIZE;
 	}
 	if(x!==undefined){
+	    this.ox = x;
 	    this.x = x + 5*UNIT_SIZE;
 	}
 	return this;
