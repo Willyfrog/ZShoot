@@ -60,7 +60,7 @@ window.onload = function () {
             this.bind("EnterFrame", function() {
                 this.x += this.dir.x;
                 this.y += this.dir.y;
-                if (this.x < 0 || this.x > WORLD_WIDTH*UNIT_SIZE || this.y < 0 || this.y > WORLD_HEIGHT*UNIT_SIZE) {
+                if (this.x < 0 || this.x > (WORLD_WIDTH + 10)*UNIT_SIZE || this.y < 0 || this.y > (WORLD_HEIGHT + 10)*UNIT_SIZE) {
                     this.destroy();
                 }
             });
@@ -70,7 +70,7 @@ window.onload = function () {
     Crafty.c("Shooter", {
         init: function () {
             this.addComponent("2D, Mouse");
-            this.attr({x: 0, y: 0, w: WORLD_WIDTH*UNIT_SIZE, h: WORLD_HEIGHT*UNIT_SIZE});
+            this.attr({x: 0, y: 0, w: (WORLD_WIDTH+10)*UNIT_SIZE, h: (WORLD_HEIGHT+10)*UNIT_SIZE});
             console.log("I'll shoot from x" + this._x);
             this.bind('Click', function (e) {
                 console.log("fire, exclamation mark");
