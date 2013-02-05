@@ -3,6 +3,8 @@ var UNIT_SIZE = 8,
     WORLD_HEIGHT = 90,
     WORLD_WIDTH = 150;
 
+var xings = [];
+
 function divide_square(x1,y1,w,h){
     // si es el tamaño minimo, no dividimos
     if (w< BUILD_MIN_SIZE && h<BUILD_MIN_SIZE)
@@ -14,28 +16,37 @@ function divide_square(x1,y1,w,h){
     } else if (h>BUILD_MIN_SIZE) {
 	divancho = (Crafty.math.randomInt(1,3)>1);
     }
-
+    var v1, v2;
     if (divancho) {
 	var w2 = Crafty.math.randomInt(10,w - 20);
-	checkAndAddIntersection((x1+w2) * UNIT_SIZE, (y1 -10)* UNIT_SIZE);
-	checkAndAddIntersection((x1+w2)* UNIT_SIZE, (y1 + h)*UNIT_SIZE);
+	v1 = checkAndAddIntersection((x1+w2) * UNIT_SIZE, (y1 -10)* UNIT_SIZE);
+	v2 = checkAndAddIntersection((x1+w2)* UNIT_SIZE, (y1 + h)*UNIT_SIZE);
+	v1.south(v2);
+	v2.north(v1);
+	//add east-west para cada uno
 	return [[x1,y1, w2, h], [x1+w2+10, y1, w-w2-10, h]];
     }
     else {
 	var h2 = Crafty.math.randomInt(10,h - 20);
-	checkAndAddIntersection((x1-10)*UNIT_SIZE, (y1 + h2) * UNIT_SIZE);
-	checkAndAddIntersection((x1+w) * UNIT_SIZE, (y1 + h2) * UNIT_SIZE);
+	v1 = checkAndAddIntersection((x1-10)*UNIT_SIZE, (y1 + h2) * UNIT_SIZE);
+	v2 = checkAndAddIntersection((x1+w) * UNIT_SIZE, (y1 + h2) * UNIT_SIZE);
+	v1.east(v2);
+	v2.west(v1);
+	//add north-south para cada uno
 	return [[x1,y1, w, h2],[x1, y1+h2+10, w, h-h2-10]];
     }
 }
 
+
 function gen_map(maxx, maxy){
     var pasadas = 5;
     var city = [[10,10,maxx - 10,maxy - 10]];
-    Crafty.e("Interseccion").origen(0, 0);
-    Crafty.e("Interseccion").origen(maxx * UNIT_SIZE, 0);
-    Crafty.e("Interseccion").origen(maxx*UNIT_SIZE, maxy * UNIT_SIZE);
-    Crafty.e("Interseccion").origen(0, maxy*UNIT_SIZE);
+    xings[0] = [];
+    xings[0][0] = Crafty.e("Interseccion").origen(0, 0);
+    xings[maxx] = [];
+    xings[maxx][0] = Crafty.e("Interseccion").origen(maxx * UNIT_SIZE, 0);
+    xings[maxx][maxy] = Crafty.e("Interseccion").origen(maxx*UNIT_SIZE, maxy * UNIT_SIZE);
+    xings[0][maxy] = Crafty.e("Interseccion").origen(0, maxy*UNIT_SIZE);
     console.log("city inicial: " + city);
     for (var i=0; i<pasadas; i++){
 	var nucity = [];
@@ -85,17 +96,15 @@ Crafty.c("Building", {
 });
 
 function checkAndAddIntersection (x,y) {
-    var notfound = true;
-    //TODO: optimizar
-    for (var i in Crafty("Interseccion")) {
-	if (i.ox == x && i.oy == y) {
-	    notfound = false;
-	    break;
-	}
+    var found = false;
+    if (xings[x] == undefined) {
+	xings[x] = [];
+	xings[x][y] = Crafty.e("Interseccion").origen(x,y);
     }
-    if (notfound) {
-	Crafty.e("Interseccion").origen(x,y);
+    else if (xings[x][y]==undefined) {
+	xings[x][y] = Crafty.e("Interseccion").origen(x,y);
     }
+    return xings[x][y];
 }
 
 //para generar los nodos para pathfinding, deben ir a las intersecciones
