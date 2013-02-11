@@ -1,8 +1,26 @@
+// primero pre-generado -> despues generador automatico
+var world = {
+    buildings:[
+	{x:4,y:4,w:10,h:9},
+	{x:4,y:17,w:10,h:13},
+	{x:18,y:4,w:12,h:26},
+	{x:34,y:4,w:24,h:12},
+	{x:34,y:20,w:24,h:10},
+	{x:4,y:34,w:23,h:23},
+	{x:31,y:34,w:9,h:23},
+	{x:44,y:34,w:14,h:10},
+	{x:44,y:48,w:14,h:9}
+    ],
+    intersections:[]
+};
+
 Crafty.scene("GameScene", function () {
     console.log("Now on GameScene");
     Crafty.sprite(1,"recursos/z.png",{z1:[0,0,20,32]});
-    build_map(WORLD_WIDTH,WORLD_HEIGHT);
+    //build_map(WORLD_WIDTH,WORLD_HEIGHT);
     //var area = Crafty.e("2D").attr({x:0, y:0, w:WORLD_WIDTH, h: WORLD_HEIGHT});
+    console.log(world);
+    build_world(world); //TODO: generar aleatoriamente el mundo
 
     Crafty.background("#222");
     
@@ -22,8 +40,8 @@ Crafty.scene("GameScene", function () {
             Crafty.scene("GameOver");
     });
     
-    spawnZ(180, 40, p1);
-    spawnZ(500, 480, p1);
+    //spawnZ(180, 40, p1);
+    //spawnZ(500, 480, p1);
     
 });
 
